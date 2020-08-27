@@ -16,7 +16,8 @@ Fala galera, para começo de conversa eu vim aqui pq estava pensando sobre as mu
 Então para instalar o spotifyr é só você usar o comando abaixo: 
 
 ```{r, echo=F, warning=F, message=F}
-install.packages('pacman')
+
+install.packages('pacman', repos ="https://cloud.r-project.org" )
 pacman::p_load(
 tidyverse,
 lubridate,
@@ -29,6 +30,8 @@ factoextra
 )
 devtools::install_github('charlie86/spotifyr') # dev version
 devtools::install_github("hadley/emo") # emoji
+library(spotifyr)
+library(emo)
 ```
 
 
@@ -64,14 +67,10 @@ access_token <- get_spotify_access_token()
 ```
 
 
-```{r}
-library(tidyverse)
-library(spotifyr)
-library(ape)
-library(factoextra)
+```{r, message=F, warning=F}
+
 access_token <- get_spotify_access_token()
 artist <- get_artist_audio_features('anitta')
-
 
 artist %>%  
   glimpse()
@@ -93,11 +92,7 @@ Mas o que chamamos de **Componente principal**?
  Para os nossos exemplos vamos usar dados retirados do *Spotify* `r emo::ji("music")` `r emo::ji("music")``r emo::ji("music")`
  
 ```{r, echo = FALSE, message=FALSE}
-library(spotifyr)
-library(tidyverse)
-library(rpart)
-library(circlize)
-library(dendextend)
+
 
 Sys.setenv(SPOTIFY_CLIENT_ID = '980c973107584f84b3af8686d48a83e9')
 Sys.setenv(SPOTIFY_CLIENT_SECRET = '66c4e1e0d12b434badffe72d72a1310c')
