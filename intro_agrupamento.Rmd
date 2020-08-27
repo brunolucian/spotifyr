@@ -90,15 +90,7 @@ Mas o que chamamos de **Componente principal**?
  Vamos agora para um exemplo `r emo::ji("v")``r emo::ji("v")``r emo::ji("sing")`
  
  Para os nossos exemplos vamos usar dados retirados do *Spotify* `r emo::ji("music")` `r emo::ji("music")``r emo::ji("music")`
- 
-```{r, echo = FALSE, message=FALSE}
 
-
-Sys.setenv(SPOTIFY_CLIENT_ID = '980c973107584f84b3af8686d48a83e9')
-Sys.setenv(SPOTIFY_CLIENT_SECRET = '66c4e1e0d12b434badffe72d72a1310c')
-
-
-```
  
 ```{r, message=FALSE, warning=FALSE}
 artists <- "marilia mendonca"
