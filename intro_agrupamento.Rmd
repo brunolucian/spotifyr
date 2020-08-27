@@ -147,12 +147,6 @@ ggplot(loadings, aes(x = Symbol, y = Weights)) +
 
 O agrupamento é uma tecnica para dividir os dados em diferentes grupos na qual as observações são semelhantes umas as outras.
 
-```{r, eval=F}
-playlist_uri <- get_my_playlists() %>% filter(name == "Festa na Piscina") %>% select(uri) %>% pull()
-
-playlist_featured <- get_playlist_audio_features(username = "12166616731", str_split(playlist_uri, ":")[[1]][3])
-```
-
 ```{r, echo=F}
 playlist_featured <- get_playlist_audio_features(username = "12166616731","37i9dQZF1DXdWpx7KRCSbJ")
 
