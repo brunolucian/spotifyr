@@ -16,7 +16,7 @@ Fala galera, para começo de conversa eu vim aqui pq estava pensando sobre as mu
 Então para instalar o spotifyr é só você usar o comando abaixo: 
 
 ```{r, echo=F, warning=F, message=F}
-# install.packages('pacman')
+install.packages('pacman')
 pacman::p_load(
 tidyverse,
 lubridate,
