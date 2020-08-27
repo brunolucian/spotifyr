@@ -47,38 +47,13 @@ Agora voc
 ```{r}
 library(tidyverse)
 library(spotifyr)
+library(ape)
 access_token <- get_spotify_access_token()
-beatles <- get_artist_audio_features('anitta')
+artist <- get_artist_audio_features('anitta')
 
 
-beatles %>% 
-  # count(key_mode, sort = TRUE) %>% 
-  # head(5) %>% 
+artist %>%  
   glimpse()
-
-
-# 
-# library(lubridate)
-# 
-# get_my_recently_played(limit = 5) %>% 
-#   mutate(artist.name = map_chr(track.artists, function(x) x$name[1]),
-#          played_at = as_datetime(played_at)) %>% 
-#   select(track.name, artist.name, track.album.name, played_at)
-# 
-# 
-# get_my_top_artists_or_tracks(type = 'artists', time_range = 'long_term', limit = 5) %>% 
-#   select(name, genres) %>% 
-#   rowwise %>% 
-#   mutate(genres = paste(genres, collapse = ', '))
-# 
-# 
-# get_my_top_artists_or_tracks(type = 'tracks', time_range = 'short_term', limit = 5) %>% 
-#   mutate(artist.name = map_chr(artists, function(x) x$name[1])) %>% 
-#   select(name, artist.name, album.name)
-# 
-# my_id <- Sys.getenv("SPOTIFY_CLIENT_ID")
-# my_plists <- get_user_playlists("12166616731")
-
 
 ```
 
@@ -104,7 +79,6 @@ library(tidyverse)
 library(rpart)
 library(circlize)
 library(dendextend)
-
 
 Sys.setenv(SPOTIFY_CLIENT_ID = '980c973107584f84b3af8686d48a83e9')
 Sys.setenv(SPOTIFY_CLIENT_SECRET = '66c4e1e0d12b434badffe72d72a1310c')
@@ -144,6 +118,7 @@ Vamos investigar um pouco os pesos das componentes, para isso vamos criar um plo
 loadings <- as_data_frame(pca$loadings[,1:4])
 loadings$Symbol <- row.names(pca$loadings)
 loadings <- tidyr::gather(loadings, "Component", "Weights", -Symbol)
+
 ggplot(loadings, aes(x = Symbol, y = Weights)) + 
   geom_bar(stat = "identity") +
   facet_grid(Component ~ .)
@@ -160,11 +135,11 @@ O agrupamento é uma tecnica para dividir os dados em diferentes grupos na qual 
 ```{r, eval=F}
 playlist_uri <- get_my_playlists() %>% filter(name == "Top Brasil") %>% select(uri) %>% pull()
 
-playlist_featured <- get_playlist_audio_features(username = "12166616731",str_split(playlist_uri, ":")[[1]][3])
+playlist_featured <- get_playlist_audio_features(username = "12166616731", str_split(playlist_uri, ":")[[1]][3])
 ```
 
 ```{r, echo=F}
-playlist_featured <- get_playlist_audio_features(username = "12166616731","37i9dQZF1DX0FOF1IUWK1W")
+playlist_featured <- get_playlist_audio_features(username = "12166616731","37i9dQZF1DXdWpx7KRCSbJ")
 
 playlist_featured %>% glimpse()
 ```
@@ -174,12 +149,11 @@ playlist_featured_filtered <- playlist_featured %>% select(danceability, energy,
 ```
 
 ```{r}
-pct_var <- data_frame(pct_var = 0, num_clusters = 2:8)
-totalss <- kmeans(playlist_featured_filtered, centers = 4, nstart = 20, iter.max = 50)
+pct_var <- data_frame(pct_var = 0, num_clusters = 1:8)
 
-for (i in 2:8) {
-  print(i)
-  pct_var[i-1, 'pct_var'] <- kmeans(playlist_featured_filtered, centers = i, nstart = 20, iter.max = 50)$tot.withinss
+for (i in 1:8) {
+  # print(i)
+  pct_var[i-1, 'pct_var'] <- kmeans(playlist_featured_filtered, centers = i, iter.max = 50)$tot.withinss
 }
 
 ```
@@ -191,8 +165,35 @@ plot(pct_var$num_clusters, pct_var$pct_var,
        col = "dodgerblue")
 ```
 
-<iframe width="30%" height="100" scrolling="no" frameborder="no" allow="autoplay"
-src="https://p.scdn.co/mp3-preview/f8d3306cc6b61e76b9ed7e506c59c3ee170b80f6?cid=980c973107584f84b3af8686d48a83e9"></iframe>
+```{r}
+totalss <- kmeans(playlist_featured_filtered, centers = 4, iter.max = 50)
+totalss
+```
+
+```{r}
+playlist_featured$cluster <- totalss$cluster
+
+musics <- playlist_featured %>% group_by(cluster) %>% select(track.id) %>% slice(1)
+music_cluster <- glue::glue("https://open.spotify.com/embed/track/{musics$track.id}")
+
+```
+
+### Cluster 1
+
+<iframe src="`r music_cluster[1]`" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+
+### Cluster 2
+
+<iframe src="`r music_cluster[2]`" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+
+### Cluster 3
+
+<iframe src="`r music_cluster[3]`" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+
+### Cluster 4
+
+<iframe src="`r music_cluster[4]`" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+
 
 ### Agrupamento Hieraquico
 
@@ -222,18 +223,13 @@ album_data_summarise <- album_data_summarise %>%
   as.data.frame()
 ```
 
-```{r, eval=FALSE }
-top_dend <- as.dendrogram(dist(album_data_summarise)) #%>% color_branches(k=4) %>% 
-  # color_labels
+```{r, eval=T }
+top_dend <- as.dendrogram(hclust(dist(album_data_summarise)))
 
-library(ape)
+
 plot(as.phylo(top_dend), type = "fan", cex = 0.6,
      no.margin = TRUE)
 
-# plot the radial plot
-par(mar = rep(0,4))
-# circlize_dendrogram(dend, dend_track_height = 0.8) 
-circlize_dendrogram(top_dend, labels_track_height = NA, dend_track_height = .4) 
 
 ```
 
