@@ -42,12 +42,12 @@ Sys.setenv(SPOTIFY_CLIENT_SECRET = secret)
 access_token <- get_spotify_access_token()
 ```
 
-Agora voc
 
 ```{r}
 library(tidyverse)
 library(spotifyr)
 library(ape)
+library(factoextra)
 access_token <- get_spotify_access_token()
 artist <- get_artist_audio_features('anitta')
 
@@ -56,8 +56,6 @@ artist %>%
   glimpse()
 
 ```
-
-
 
 
 ### Análise de componentes principais
@@ -108,8 +106,11 @@ album_data_filter %>% glimpse()
 Agora que temos nossas variáveis numéricas podemos aplicar o **PCA**
 
 ```{r}
-pca <- princomp(album_data_filter)
-screeplot(pca)
+
+pca <- princomp(album_data_filter,cor = T, scores = T)
+# screeplot(pca, )
+fviz_eig(pca)
+
 ```
 
 Vamos investigar um pouco os pesos das componentes, para isso vamos criar um plot com as cargas. Mas vamos nos ater apenas as 4 primeiras.
