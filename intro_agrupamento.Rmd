@@ -112,6 +112,12 @@ pca <- princomp(album_data_filter,cor = T, scores = T)
 fviz_eig(pca)
 
 ```
+```{r}
+fviz_pca_biplot(pca, repel = TRUE,
+                col.var = "#2E9FDF", # Variables color
+                col.ind = "#696969"  # Individuals color
+                )
+```
 
 Vamos investigar um pouco os pesos das componentes, para isso vamos criar um plot com as cargas. Mas vamos nos ater apenas as 4 primeiras.
 
